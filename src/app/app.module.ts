@@ -8,6 +8,21 @@ import { MyApp } from './app.component';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
 
+import firebase from 'firebase';
+import keys from '../../config/keys';
+
+let firebaseConfig = {
+  apiKey: keys.apiKey,
+  authDomain: keys.authDomain,
+  databaseURL: keys.databaseURL,
+  projectId: keys.projectId,
+  storageBucket: keys.storageBucket,
+  messagingSenderId: keys.messagingSenderId,
+  appId: keys.appId
+};
+
+firebase.initializeApp(firebaseConfig);
+
 @NgModule({
   declarations: [MyApp, LoginPage, SignupPage],
   imports: [BrowserModule, IonicModule.forRoot(MyApp)],
