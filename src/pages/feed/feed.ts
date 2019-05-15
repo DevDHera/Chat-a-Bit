@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import {
+  NavController,
+  NavParams,
+  LoadingController,
+  ToastController
+} from 'ionic-angular';
 import firebase from 'firebase';
-import moment from 'moment';
+import moment, { duration } from 'moment';
 
 @Component({
   selector: 'page-feed',
@@ -14,12 +19,23 @@ export class FeedPage {
   cursor: any;
   infiniteEvent: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController
+  ) {
     this.getPosts();
   }
 
   getPosts() {
     this.posts = [];
+
+    let loading = this.loadingCtrl.create({
+      content: 'Loading Feed...'
+    });
+
+    loading.present();
 
     let query = firebase
       .firestore()
@@ -27,23 +43,23 @@ export class FeedPage {
       .orderBy('created', 'desc')
       .limit(this.pageSize);
 
-    query.onSnapshot(snapshot => {
-      let changedDocs = snapshot.docChanges();
+    // query.onSnapshot(snapshot => {
+    //   let changedDocs = snapshot.docChanges();
 
-      changedDocs.forEach((change: any) => {
-        if ((change.type = 'added')) {
-        }
+    //   changedDocs.forEach((change: any) => {
+    //     if ((change.type = 'added')) {
+    //     }
 
-        if ((change.type = 'modified')) {
-          console.log(
-            'Document with id: ' + change.doc.id + ' has been modified.'
-          );
-        }
+    //     if ((change.type = 'modified')) {
+    //       console.log(
+    //         'Document with id: ' + change.doc.id + ' has been modified.'
+    //       );
+    //     }
 
-        if ((change.type = 'removed')) {
-        }
-      });
-    });
+    //     if ((change.type = 'removed')) {
+    //     }
+    //   });
+    // });
 
     query
       .get()
@@ -51,6 +67,8 @@ export class FeedPage {
         docs.forEach(doc => {
           this.posts.push(doc);
         });
+
+        loading.dismiss();
 
         this.cursor = this.posts[this.posts.length - 1];
         console.log(this.posts);
@@ -109,6 +127,16 @@ export class FeedPage {
       })
       .then(doc => {
         console.log(doc);
+
+        this.text = '';
+
+        this.toastCtrl
+          .create({
+            message: 'Your post has been created successfully.',
+            duration: 3000
+          })
+          .present();
+
         this.getPosts();
       })
       .catch(err => {
