@@ -49,24 +49,27 @@ export class FeedPage {
       .orderBy('created', 'desc')
       .limit(this.pageSize);
 
-    // query.onSnapshot((snapshot) => {
-    //   let changedDocs = snapshot.docChanges();
+    query.onSnapshot(snapshot => {
+      let changedDocs = snapshot.docChanges();
 
-    //   changedDocs.forEach((change) => {
-    //     if(change.type == "added"){
-    //       // TODO
-    //     }
+      changedDocs.forEach(change => {
+        if (change.type == 'added') {
+          // TODO
+        }
 
-    //     if(change.type == "modified"){
-    //       // TODO
-    //       console.log("Document with id " + change.doc.id + " has been modified.");
-    //     }
+        if (change.type == 'modified') {
+          for (let i = 0; i < this.posts.length; i++) {
+            if (this.posts[i].id == change.doc.id) {
+              this.posts[i] = change.doc;
+            }
+          }
+        }
 
-    //     if(change.type == "removed"){
-    //       // TODO
-    //     }
-    //   })
-    // })
+        if (change.type == 'removed') {
+          // TODO
+        }
+      });
+    });
 
     query
       .get()
@@ -266,13 +269,16 @@ export class FeedPage {
   }
 
   like(post) {
-    console.log(post);
+    console.log(
+      post.data().likes &&
+        post.data().likes.includes(firebase.auth().currentUser.uid)
+    );
     let body = {
       postId: post.id,
       userId: firebase.auth().currentUser.uid,
       action:
         post.data().likes &&
-        post.data().likes[firebase.auth().currentUser.uid] == true
+        post.data().likes.includes(firebase.auth().currentUser.uid)
           ? 'unlike'
           : 'like'
     };
