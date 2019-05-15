@@ -283,6 +283,12 @@ export class FeedPage {
           : 'like'
     };
 
+    let toast = this.toastCtrl.create({
+      message: 'Updating like... Please wait'
+    });
+
+    toast.present();
+
     this.http
       .post(
         'https://us-central1-chat-a-bit.cloudfunctions.net/updateLikesCount',
@@ -294,9 +300,17 @@ export class FeedPage {
       .subscribe(
         data => {
           console.log(data);
+          toast.setMessage('Like Updated!');
+          setTimeout(() => {
+            toast.dismiss();
+          }, 3000);
         },
         error => {
           console.log(error);
+          toast.setMessage('An error has occured. Please try again later');
+          setTimeout(() => {
+            toast.dismiss();
+          }, 3000);
         }
       );
   }
