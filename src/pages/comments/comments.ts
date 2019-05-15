@@ -6,9 +6,10 @@ import { NavController, NavParams } from 'ionic-angular';
   templateUrl: 'comments.html'
 })
 export class CommentsPage {
-  constructor(public navCtrl: NavController, public navParams: NavParams) {}
+  post: any = {};
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad CommentsPage');
+  constructor(public navCtrl: NavController, public navParams: NavParams) {
+    this.post = this.navParams.get('post');
+    console.log(this.post);
   }
 }
