@@ -20,6 +20,7 @@ export class FeedPage {
   pageSize: number = 10;
   cursor: any;
   infiniteEvent: any;
+  image: string;
 
   constructor(
     public navCtrl: NavController,
@@ -188,6 +189,7 @@ export class FeedPage {
       .getPicture(options)
       .then(base64Image => {
         console.log(base64Image);
+        this.image = 'data:image/png;base64,' + base64Image;
       })
       .catch(err => {
         console.log(err);
