@@ -13,6 +13,7 @@ import { FeedPage } from '../pages/feed/feed';
 import { CommentsPage } from '../pages/comments/comments';
 
 import { Camera } from '@ionic-native/camera';
+import { Firebase } from '@ionic-native/firebase/ngx';
 
 import firebase from 'firebase';
 import keys from '../../config/keys';
@@ -41,6 +42,7 @@ firebase.initializeApp(firebaseConfig);
     StatusBar,
     SplashScreen,
     Camera,
+    Firebase,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
