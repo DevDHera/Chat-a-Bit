@@ -211,6 +211,12 @@ export class FeedPage {
 
   upload(name: string) {
     return new Promise((resolve, reject) => {
+      let loading = this.loadingCtrl.create({
+        content: 'Uploading Image...'
+      });
+
+      loading.present();
+
       let ref = firebase.storage().ref('postImages/' + name);
 
       let uploadTask = ref.putString(this.image.split(',')[1], 'base64');
@@ -219,6 +225,9 @@ export class FeedPage {
         'state_changed',
         taskSnapshot => {
           console.log(taskSnapshot);
+          let percentage =
+            (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
+          loading.setContent('Uploaded ' + percentage + '% ...');
         },
         error => {
           console.log(error);
@@ -237,13 +246,16 @@ export class FeedPage {
                   image: url
                 })
                 .then(() => {
+                  loading.dismiss();
                   resolve();
                 })
                 .catch(err => {
+                  loading.dismiss();
                   reject();
                 });
             })
             .catch(err => {
+              loading.dismiss();
               reject();
             });
         }
