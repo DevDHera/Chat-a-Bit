@@ -6,7 +6,7 @@ import {
   ToastController
 } from 'ionic-angular';
 import firebase from 'firebase';
-import moment, { duration } from 'moment';
+import moment from 'moment';
 import { LoginPage } from '../login/login';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 
@@ -47,23 +47,24 @@ export class FeedPage {
       .orderBy('created', 'desc')
       .limit(this.pageSize);
 
-    // query.onSnapshot(snapshot => {
+    // query.onSnapshot((snapshot) => {
     //   let changedDocs = snapshot.docChanges();
 
-    //   changedDocs.forEach((change: any) => {
-    //     if ((change.type = 'added')) {
+    //   changedDocs.forEach((change) => {
+    //     if(change.type == "added"){
+    //       // TODO
     //     }
 
-    //     if ((change.type = 'modified')) {
-    //       console.log(
-    //         'Document with id: ' + change.doc.id + ' has been modified.'
-    //       );
+    //     if(change.type == "modified"){
+    //       // TODO
+    //       console.log("Document with id " + change.doc.id + " has been modified.");
     //     }
 
-    //     if ((change.type = 'removed')) {
+    //     if(change.type == "removed"){
+    //       // TODO
     //     }
-    //   });
-    // });
+    //   })
+    // })
 
     query
       .get()
@@ -75,6 +76,7 @@ export class FeedPage {
         loading.dismiss();
 
         this.cursor = this.posts[this.posts.length - 1];
+
         console.log(this.posts);
       })
       .catch(err => {
@@ -94,9 +96,11 @@ export class FeedPage {
         docs.forEach(doc => {
           this.posts.push(doc);
         });
+
         console.log(this.posts);
 
         if (docs.size < this.pageSize) {
+          // all documents have been loaded
           event.enable(false);
           this.infiniteEvent = event;
         } else {
@@ -110,6 +114,8 @@ export class FeedPage {
   }
 
   refresh(event) {
+    this.posts = [];
+
     this.getPosts();
 
     if (this.infiniteEvent) {
@@ -129,16 +135,17 @@ export class FeedPage {
         owner: firebase.auth().currentUser.uid,
         owner_name: firebase.auth().currentUser.displayName
       })
-      .then(doc => {
+      .then(async doc => {
         console.log(doc);
 
         if (this.image) {
-          this.upload(doc.id);
+          await this.upload(doc.id);
         }
 
         this.text = '';
+        this.image = undefined;
 
-        this.toastCtrl
+        let toast = this.toastCtrl
           .create({
             message: 'Your post has been created successfully.',
             duration: 3000
@@ -162,12 +169,13 @@ export class FeedPage {
       .auth()
       .signOut()
       .then(() => {
-        this.toastCtrl
+        let toast = this.toastCtrl
           .create({
-            message: 'You have been logout successfully',
+            message: 'You have been logged out successfully.',
             duration: 3000
           })
           .present();
+
         this.navCtrl.setRoot(LoginPage);
       });
   }
@@ -193,6 +201,7 @@ export class FeedPage {
       .getPicture(options)
       .then(base64Image => {
         console.log(base64Image);
+
         this.image = 'data:image/png;base64,' + base64Image;
       })
       .catch(err => {
@@ -201,23 +210,44 @@ export class FeedPage {
   }
 
   upload(name: string) {
-    let ref = firebase.storage().ref('postImages/' + name);
-    let uploadTask = ref.putString(this.image.split(',')[1], 'base64');
-    uploadTask.on(
-      'state_changed',
-      taskSnapshot => {
-        console.log(taskSnapshot);
-      },
-      error => {
-        console.log(error);
-      },
-      () => {
-        console.log('The upload is complete!');
+    return new Promise((resolve, reject) => {
+      let ref = firebase.storage().ref('postImages/' + name);
 
-        uploadTask.snapshot.ref.getDownloadURL().then(url => {
-          console.log(url);
-        });
-      }
-    );
+      let uploadTask = ref.putString(this.image.split(',')[1], 'base64');
+
+      uploadTask.on(
+        'state_changed',
+        taskSnapshot => {
+          console.log(taskSnapshot);
+        },
+        error => {
+          console.log(error);
+        },
+        () => {
+          console.log('The upload is complete!');
+
+          uploadTask.snapshot.ref
+            .getDownloadURL()
+            .then(url => {
+              firebase
+                .firestore()
+                .collection('posts')
+                .doc(name)
+                .update({
+                  image: url
+                })
+                .then(() => {
+                  resolve();
+                })
+                .catch(err => {
+                  reject();
+                });
+            })
+            .catch(err => {
+              reject();
+            });
+        }
+      );
+    });
   }
 }

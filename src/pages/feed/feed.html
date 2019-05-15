@@ -12,7 +12,7 @@
 
 <ion-content>
   <ion-row margin class="rowStyle">
-    <button ion-button icon-only clear color="danger" (click)="addPhoto()">
+    <button ion-button icon-only color="danger" clear (click)="addPhoto()">
       <ion-icon name="images"></ion-icon>
     </button>
 
@@ -22,7 +22,7 @@
       [(ngModel)]="text"
     ></ion-input>
 
-    <button ion-button icon-only clear color="danger" (click)="post()">
+    <button ion-button icon-only color="danger" clear (click)="post()">
       <ion-icon name="send"></ion-icon>
     </button>
   </ion-row>
@@ -39,21 +39,23 @@
 
   <ion-card *ngFor="let post of posts">
     <ion-item-divider color="danger">
-      {{ post.data().owner_name }} says
+      {{ post.data().owner_name }} Says
     </ion-item-divider>
 
     <ion-item text-wrap>
       {{ post.data().text }}
     </ion-item>
 
+    <img [src]="post.data().image" *ngIf="post.data().image" />
+
     <ion-row class="bottom-bar">
       <ion-col>
         <button
           ion-button
+          block
           icon-left
           clear
           small
-          block
           color="danger"
           class="border-right"
         >
@@ -61,14 +63,13 @@
           <small>12 Likes</small>
         </button>
       </ion-col>
-
       <ion-col>
         <button
           ion-button
+          block
           icon-left
           clear
           small
-          block
           color="danger"
           class="border-right"
         >
@@ -76,9 +77,8 @@
           <small>12 Comments</small>
         </button>
       </ion-col>
-
       <ion-col>
-        <button ion-button icon-left clear small block color="danger">
+        <button ion-button block icon-left clear small color="danger">
           <small>{{ ago(post.data().created.toDate()) }} ago</small>
         </button>
       </ion-col>
@@ -86,6 +86,6 @@
   </ion-card>
 
   <ion-infinite-scroll (ionInfinite)="loadMorePosts($event)">
-    <ion-infinite-scroll-content> </ion-infinite-scroll-content>
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 </ion-content>
