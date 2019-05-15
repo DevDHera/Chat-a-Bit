@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import firebase from 'firebase';
+import moment from 'moment';
 
 @Component({
   selector: 'page-feed',
@@ -20,6 +21,7 @@ export class FeedPage {
     firebase
       .firestore()
       .collection('posts')
+      .orderBy('created', 'desc')
       .get()
       .then(docs => {
         docs.forEach(doc => {
@@ -49,5 +51,10 @@ export class FeedPage {
       .catch(err => {
         console.log(err);
       });
+  }
+
+  ago(time) {
+    let difference = moment(time).diff(moment());
+    return moment.duration(difference).humanize();
   }
 }
