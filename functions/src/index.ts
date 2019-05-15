@@ -9,10 +9,15 @@ admin.initializeApp(functions.config().firebase);
 export const updateLikesCount = functions.https.onRequest(
   (request, response) => {
     console.log(request.body);
-
-    const postId = request.body.postId;
-    const userId = request.body.userId;
-    const action = request.body.action; // 'like' or 'unlike'
+    let body: any;
+    if (typeof request.body === 'string') {
+      body = JSON.parse(request.body);
+    } else {
+      body = request.body;
+    }
+    const postId = body.postId;
+    const userId: string = body.userId;
+    const action = body.action; // 'like' or 'unlike'
 
     admin
       .firestore()
@@ -21,18 +26,18 @@ export const updateLikesCount = functions.https.onRequest(
       .get()
       .then((data: any) => {
         let likesCount = data.data().likesCount || 0;
-        // let likes = data.data().likes || [];
-
-        let updateData: any = {};
-
-        if (action == 'like') {
+        const likes = data.data().likes || [];
+        const updateData: { likesCount: number; likes: string[] } = {
+          likesCount: likesCount,
+          likes: likes
+        };
+        if (action === 'like') {
           updateData['likesCount'] = ++likesCount;
-          updateData[`likes.${userId}`] = true;
+          updateData['likes'].push(userId);
         } else {
           updateData['likesCount'] = --likesCount;
-          updateData[`likes.${userId}`] = false;
+          updateData['likes'].splice(updateData['likes'].indexOf(userId), 1);
         }
-
         admin
           .firestore()
           .collection('posts')
@@ -41,12 +46,12 @@ export const updateLikesCount = functions.https.onRequest(
           .then(() => {
             response.status(200).send('Done');
           })
-          .catch(err => {
-            response.status(err.code).send(err.message);
+          .catch(error => {
+            response.status(error.code).send(error.message);
           });
       })
-      .catch(err => {
-        response.status(err.code).send(err.message);
+      .catch(error => {
+        response.status(error.code).send(error.message);
       });
   }
 );
