@@ -10,6 +10,7 @@ import { MyApp } from './app.component';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
 import { FeedPage } from '../pages/feed/feed';
+import { CommentsPage } from '../pages/comments/comments';
 
 import { Camera } from '@ionic-native/camera';
 
@@ -32,10 +33,10 @@ firebase.initializeApp(firebaseConfig);
 // });
 
 @NgModule({
-  declarations: [MyApp, LoginPage, SignupPage, FeedPage],
+  declarations: [MyApp, LoginPage, SignupPage, FeedPage, CommentsPage],
   imports: [BrowserModule, HttpClientModule, IonicModule.forRoot(MyApp)],
   bootstrap: [IonicApp],
-  entryComponents: [MyApp, LoginPage, SignupPage, FeedPage],
+  entryComponents: [MyApp, LoginPage, SignupPage, FeedPage, CommentsPage],
   providers: [
     StatusBar,
     SplashScreen,
