@@ -8,8 +8,29 @@ import firebase from 'firebase';
 })
 export class FeedPage {
   text: string = '';
+  posts: any[] = [];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {}
+  constructor(public navCtrl: NavController, public navParams: NavParams) {
+    this.getPosts();
+  }
+
+  getPosts() {
+    this.posts = [];
+
+    firebase
+      .firestore()
+      .collection('posts')
+      .get()
+      .then(docs => {
+        docs.forEach(doc => {
+          this.posts.push(doc);
+        });
+        console.log(this.posts);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 
   post() {
     firebase
@@ -23,6 +44,7 @@ export class FeedPage {
       })
       .then(doc => {
         console.log(doc);
+        this.getPosts();
       })
       .catch(err => {
         console.log(err);

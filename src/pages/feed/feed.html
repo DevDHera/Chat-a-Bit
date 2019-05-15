@@ -27,16 +27,13 @@
     </button>
   </ion-row>
 
-  <ion-card>
+  <ion-card *ngFor="let post of posts">
     <ion-item-divider color="danger">
-      Bod says
+      {{ post.data().owner_name }} says
     </ion-item-divider>
 
     <ion-item text-wrap>
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dicta
-      perspiciatis, vel corporis sint corrupti unde ipsum at atque! Sunt
-      doloribus alias id velit molestias quod dolore, aliquam reprehenderit
-      laudantium suscipit?
+      {{ post.data().text }}
     </ion-item>
 
     <ion-row class="bottom-bar">
