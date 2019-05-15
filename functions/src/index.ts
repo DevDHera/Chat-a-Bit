@@ -55,3 +55,34 @@ export const updateLikesCount = functions.https.onRequest(
       });
   }
 );
+
+export const updateCommentsCount = functions.firestore
+  .document('comments/{commentId}')
+  .onCreate(async event => {
+    let data: any = event.data();
+
+    let postId = data.post;
+
+    let doc: any = await admin
+      .firestore()
+      .collection('posts')
+      .doc(postId)
+      .get();
+
+    if (doc.exists) {
+      let commentsCount = doc.data().commentsCount || 0;
+      commentsCount++;
+
+      await admin
+        .firestore()
+        .collection('posts')
+        .doc(postId)
+        .update({
+          commentsCount: commentsCount
+        });
+
+      return true;
+    } else {
+      return false;
+    }
+  });
