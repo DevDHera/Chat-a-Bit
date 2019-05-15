@@ -23,6 +23,9 @@ let firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+firebase.firestore().settings({
+  timestampsInSnapshots: true
+});
 
 @NgModule({
   declarations: [MyApp, LoginPage, SignupPage, FeedPage],
