@@ -7,6 +7,7 @@ import {
 } from 'ionic-angular';
 import firebase from 'firebase';
 import moment, { duration } from 'moment';
+import { LoginPage } from '../login/login';
 
 @Component({
   selector: 'page-feed',
@@ -147,5 +148,20 @@ export class FeedPage {
   ago(time) {
     let difference = moment(time).diff(moment());
     return moment.duration(difference).humanize();
+  }
+
+  logout() {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        this.toastCtrl
+          .create({
+            message: 'You have been logout successfully',
+            duration: 3000
+          })
+          .present();
+        this.navCtrl.setRoot(LoginPage);
+      });
   }
 }
