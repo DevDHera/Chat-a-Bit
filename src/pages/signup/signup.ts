@@ -6,6 +6,7 @@ import {
   AlertController
 } from 'ionic-angular';
 import firebase from 'firebase';
+import { FeedPage } from '../feed/feed';
 
 @Component({
   selector: 'page-signup',
@@ -47,7 +48,7 @@ export class SignupPage {
                   {
                     text: 'Ok',
                     handler: () => {
-                      // Navigate to the feeds page
+                      this.navCtrl.setRoot(FeedPage);
                     }
                   }
                 ]
